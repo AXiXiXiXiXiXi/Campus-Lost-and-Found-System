@@ -230,3 +230,25 @@ python manage.py migrate
 .\.venv\Scripts\Activate.ps1
 python manage.py runserver
 ```
+
+## 十一、系统界面预览
+
+系统涵盖账号登录、校园数据隔离、失物与招领信息发布、在线认领审批、公告管理以及超级管理员管理等功能。下图为各核心页面预览：
+
+| 登录页面 | 超级管理员首页 |
+| :---: | :---: |
+| ![登录页面](img/01-login-page.png) | ![超级管理员首页](img/02-super-admin-dashboard.png) |
+
+| 失物信息列表 | 招领信息列表 |
+| :---: | :---: |
+| ![失物信息列表](img/03-lost-items-list.png) | ![招领信息列表](img/04-found-items-list.png) |
+
+| 认领申请管理 | 公告管理 |
+| :---: | :---: |
+| ![认领申请管理](img/05-claim-applications.png) | ![公告管理](img/06-announcement-management.png) |
+
+| 用户管理 | |
+| :---: | :---: |
+| ![用户管理](img/07-user-management.png) | |
+
+> 截图中的部分账号信息已进行遮挡处理。
