@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# 虚拟环境
+.venv/
+venv/
+env/
+ENV/
+
+# 打包、测试和缓存
+build/
+dist/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Django 本地运行文件
+*.log
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+local_settings.py
+
+# 用户上传的图片和运行时媒体文件
+media/
+
+# 环境变量和敏感信息
+.env
+.env.*
+!.env.example
+
+# IDE 和系统文件
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# 本地数据库备份
+*.local.sql
+backups/
+database/private/
+
