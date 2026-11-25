@@ -10,22 +10,40 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env", interpolate=False)
+
+
+def required_env(name):
+    value = os.getenv(name)
+    if not value:
+        raise ImproperlyConfigured(f"{name} is required. See .env.example.")
+    return value
+
+
+def env_list(name, default=""):
+    return [entry.strip() for entry in os.getenv(name, default).split(",") if entry.strip()]
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qh@um=8!f76yusn9d4zcwd88ujxtm4ph3wpilo=bb%bn6172jp'
+SECRET_KEY = required_env("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "false").strip().lower() in {"1", "true", "yes"}
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost")
+CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
+CAMPUS_SUPPORT_EMAIL = os.getenv("CAMPUS_SUPPORT_EMAIL", "").strip()
 
 
 # Application definition
@@ -62,6 +80,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'lostfound.context_processors.support_contact',
             ],
         },
     },
@@ -76,11 +95,11 @@ WSGI_APPLICATION = 'campus_lostfound.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'campus_lostfound',
-        'USER': 'root',
-        'PASSWORD': '2696432514',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': required_env('MYSQL_DATABASE'),
+        'USER': required_env('MYSQL_USER'),
+        'PASSWORD': required_env('MYSQL_PASSWORD'),
+        'HOST': os.getenv('MYSQL_HOST', '127.0.0.1'),
+        'PORT': os.getenv('MYSQL_PORT', '3306'),
         'OPTIONS': {
             'charset': 'utf8mb4',
         },

@@ -1,0 +1,25 @@
+<article class="record-page record-page-compact" aria-labelledby="delete-record-title">
+    <header class="record-heading">
+        <h1 id="delete-record-title">{{ heading }}</h1>
+    </header>
+
+    <div class="delete-page record-confirmation">
+        <p class="record-confirm-question" id="delete-record-question">确定删除「<strong>{{ record.title }}</strong>」吗？</p>
+        {% if record.lost_location %}
+            <dl class="record-facts">
+                <div><dt>分类</dt><dd>{{ record.get_category_display }}</dd></div>
+                <div><dt>丢失地点</dt><dd>{{ record.lost_location }}</dd></div>
+            </dl>
+        {% endif %}
+        <p class="feedback feedback-error" id="delete-record-warning">
+            {% include 'lostfound/components/icon.html' with icon='info' only %}
+            <span>此操作不可撤销。</span>
+        </p>
+        <form class="form-end record-actions" method="post"
+              aria-labelledby="delete-record-title" aria-describedby="delete-record-question delete-record-warning">
+            {% csrf_token %}
+            <a class="action action-outline" href="{% url detail_route record.pk %}">取消</a>
+            <button class="action action-danger" type="submit">确认删除</button>
+        </form>
+    </div>
+</article>

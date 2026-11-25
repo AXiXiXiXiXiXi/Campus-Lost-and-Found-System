@@ -1,0 +1,18 @@
+{% if form.errors %}
+    <section class="validation" tabindex="-1" aria-labelledby="validation-title" data-form-errors>
+        <h2 id="validation-title">请检查表单中的问题</h2>
+        {{ form.non_field_errors }}
+        {% if not form.non_field_errors or form.errors|length > 1 %}
+            <ul>
+                {% for field in form.visible_fields %}
+                    {% if field.errors %}
+                        <li><a href="#{{ field.id_for_label|default:field.auto_id }}">{{ field.label }}：{{ field.errors|join:"；" }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% for field in form.hidden_fields %}
+                    {% if field.errors %}<li>{{ field.errors|join:"；" }}</li>{% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
+{% endif %}

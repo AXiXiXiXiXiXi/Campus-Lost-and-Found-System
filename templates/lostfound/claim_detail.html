@@ -1,68 +1,53 @@
 {% extends 'lostfound/base.html' %}
+{% load static %}
 
-{% block title %}认领申请详情 - 校园失物招领系统{% endblock %}
+{% block title %}认领申请详情 · 校园失物招领{% endblock %}
 
-{% block content %}
-<div class="card" style="max-width: 900px; margin: 0 auto;">
-    <div style="margin-bottom: 2rem;">
-        <a href="{% url 'claim_list' %}" style="color: #667eea; text-decoration: none;">← 返回认领列表</a>
-    </div>
-
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h2 style="color: #333; margin: 0;">认领申请详情</h2>
-        <span style="background: {% if claim.status == 'pending' %}#fff3cd{% elif claim.status == 'approved' %}#d4edda{% else %}#f8d7da{% endif %}; 
-                     color: {% if claim.status == 'pending' %}#856404{% elif claim.status == 'approved' %}#155724{% else %}#721c24{% endif %}; 
-                     padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 500; font-size: 1.1rem;">
-            {{ claim.get_status_display }}
-        </span>
-    </div>
-
-    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-        <h3 style="color: #333; margin-bottom: 1rem;">失物信息</h3>
-        <p style="margin: 0.5rem 0;"><strong>标题：</strong>
-            <a href="{% url 'lost_item_detail' claim.lost_item.pk %}" style="color: #667eea;">{{ claim.lost_item.title }}</a>
-        </p>
-        <p style="margin: 0.5rem 0;"><strong>分类：</strong>{{ claim.lost_item.get_category_display }}</p>
-        <p style="margin: 0.5rem 0;"><strong>丢失地点：</strong>{{ claim.lost_item.lost_location }}</p>
-        <p style="margin: 0.5rem 0;"><strong>发布人：</strong>{{ claim.lost_item.publish_user.username }}</p>
-    </div>
-
-    <div style="background: white; border: 1px solid #e0e0e0; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-        <h3 style="color: #333; margin-bottom: 1rem;">认领说明</h3>
-        <p style="color: #666; line-height: 1.8; white-space: pre-wrap;">{{ claim.claim_reason }}</p>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem;">
-        <div style="background: white; border: 1px solid #e0e0e0; padding: 1rem; border-radius: 8px;">
-            <div style="color: #999; font-size: 0.9rem; margin-bottom: 0.25rem;">认领人</div>
-            <div style="color: #333; font-weight: 500;">{{ claim.claim_user.username }}</div>
-        </div>
-        <div style="background: white; border: 1px solid #e0e0e0; padding: 1rem; border-radius: 8px;">
-            <div style="color: #999; font-size: 0.9rem; margin-bottom: 0.25rem;">申请时间</div>
-            <div style="color: #333; font-weight: 500;">{{ claim.create_time|date:"Y-m-d H:i" }}</div>
-        </div>
-        {% if claim.status != 'pending' %}
-        <div style="background: white; border: 1px solid #e0e0e0; padding: 1rem; border-radius: 8px;">
-            <div style="color: #999; font-size: 0.9rem; margin-bottom: 0.25rem;">处理时间</div>
-            <div style="color: #333; font-weight: 500;">{{ claim.update_time|date:"Y-m-d H:i" }}</div>
-        </div>
-        {% endif %}
-    </div>
-
-    {% if claim.admin_note %}
-    <div style="background: #e7f3ff; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-        <h3 style="color: #1976d2; margin-bottom: 1rem;">管理员备注</h3>
-        <p style="color: #666; line-height: 1.8; white-space: pre-wrap; margin: 0;">{{ claim.admin_note }}</p>
-    </div>
-    {% endif %}
-
-    {% if is_admin and claim.status == 'pending' %}
-    <div style="text-align: center;">
-        <a href="{% url 'claim_review' claim.pk %}" class="btn btn-primary" style="padding: 1rem 3rem; font-size: 1.1rem;">
-            审核此申请
-        </a>
-    </div>
-    {% endif %}
-</div>
+{% block page_styles %}
+<link rel="stylesheet" href="{% static 'lostfound/details.css' %}?v=2">
 {% endblock %}
 
+{% block content %}
+<article class="entry-detail">
+    <header class="entry-detail-header">
+        <a class="entry-detail-back" href="{% url 'claim_list' %}">{% include 'lostfound/components/icon.html' with icon='back' only %}返回认领列表</a>
+        <div class="entry-detail-heading">
+            <h1>认领申请详情</h1>
+            {% include 'lostfound/components/status.html' with status=claim.status label=claim.get_status_display only %}
+        </div>
+    </header>
+
+    <div class="entry-detail-grid">
+        <section class="entry-detail-panel" aria-labelledby="claim-facts">
+            <h2 id="claim-facts">申请信息</h2>
+            <dl class="entry-detail-facts">
+                <div><dt>认领人</dt><dd>{{ claim.claim_user.username }}</dd></div>
+                <div><dt>申请时间</dt><dd><time datetime="{{ claim.create_time|date:'c' }}">{{ claim.create_time|date:"Y-m-d H:i" }}</time></dd></div>
+                {% if claim.status != 'pending' %}
+                    <div><dt>处理时间</dt><dd><time datetime="{{ claim.update_time|date:'c' }}">{{ claim.update_time|date:"Y-m-d H:i" }}</time></dd></div>
+                {% endif %}
+            </dl>
+
+            <section class="entry-detail-group" aria-labelledby="claim-description">
+                <h3 id="claim-description">认领说明</h3>
+                <p class="entry-detail-copy">{{ claim.claim_reason }}</p>
+            </section>
+
+            {% if claim.admin_note %}
+                <section class="entry-detail-group" aria-labelledby="claim-note">
+                    <h3 id="claim-note">管理员备注</h3>
+                    <p class="entry-detail-copy">{{ claim.admin_note }}</p>
+                </section>
+            {% endif %}
+        </section>
+
+        {% include 'lostfound/components/claim_info.html' with item=claim.lost_item only %}
+    </div>
+
+    {% if is_admin and claim.status == 'pending' %}
+        <footer class="entry-detail-actions">
+            <a class="entry-detail-button entry-detail-button-primary" href="{% url 'claim_review' claim.pk %}">审核此申请</a>
+        </footer>
+    {% endif %}
+</article>
+{% endblock %}

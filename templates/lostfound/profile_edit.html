@@ -1,173 +1,63 @@
 {% extends 'lostfound/base.html' %}
+{% load static %}
 
-{% block title %}编辑个人信息 - 校园失物招领系统{% endblock %}
+{% block title %}个人设置 · 校园失物招领{% endblock %}
+
+{% block page_styles %}
+<link rel="stylesheet" href="{% static 'lostfound/account.css' %}?v=2">
+{% endblock %}
 
 {% block content %}
-<div class="card" style="max-width: 650px; margin: 0 auto;">
-    <div style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--border-color);">
-        <h2 style="color: var(--text-primary); margin: 0; font-size: 1.3rem; font-weight: 600;">编辑个人信息</h2>
-        <p style="color: var(--text-muted); margin: 0.5rem 0 0 0; font-size: 0.85rem;">修改您的联系方式和住址信息</p>
-    </div>
+<div class="account-page">
+    <header class="account-heading">
+        <a class="account-button account-back" href="{% url 'home' %}">{% include 'lostfound/components/icon.html' with icon='back' only %}返回首页</a>
+        <h1>个人设置</h1>
+    </header>
 
-    <!-- 不可编辑的信息展示 -->
-    <div style="background: var(--light-bg); padding: 1.2rem; border-radius: 4px; margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
-        <h4 style="margin: 0 0 1rem 0; color: var(--text-primary); font-size: 0.95rem; font-weight: 600;">账户信息</h4>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.2rem;">
-            <div>
-                <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.4rem;">用户名</div>
-                <div style="color: var(--text-primary); font-weight: 500; font-size: 0.95rem;">{{ user.username }}</div>
+    <div class="account-layout">
+        <form class="editor" method="post" aria-labelledby="contacts-title">
+            {% csrf_token %}
+            {% include 'lostfound/components/form_errors.html' %}
+            <h2 id="contacts-title">联系资料</h2>
+            <div class="form-grid">
+                {% include 'lostfound/components/field.html' with field=form.student_id only %}
+                {% include 'lostfound/components/field.html' with field=form.phone only %}
+                {% include 'lostfound/components/field.html' with field=form.dorm wide=True only %}
             </div>
-            <div>
-                <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.4rem;">所属学校</div>
-                <div style="color: var(--primary-color); font-weight: 500; font-size: 0.95rem;">
-                    {% if user.is_superuser %}
-                        无（超级管理员）
-                    {% else %}
-                        {{ profile.school.name }}
-                    {% endif %}
+            <div class="form-end">
+                <button class="account-button account-button-primary" type="submit">保存修改</button>
+                <a class="account-button account-button-danger" href="{% url 'home' %}">取消</a>
+            </div>
+        </form>
+
+        <aside class="account-stack" aria-label="账户与安全">
+            <section class="account-card" aria-labelledby="account-info-title">
+                <h2 id="account-info-title">账户信息</h2>
+                <dl class="account-facts">
+                    <div><dt>用户名</dt><dd>{{ user.username }}</dd></div>
+                    <div><dt>所属学校</dt><dd>{{ profile.school.name|default:"未绑定" }}</dd></div>
+                    <div><dt>角色</dt><dd>{% if user.is_superuser %}超级管理员{% else %}{{ profile.get_role_display }}{% endif %}</dd></div>
+                </dl>
+            </section>
+            <section class="account-card" aria-labelledby="account-security-title">
+                <h2 id="account-security-title">账户安全</h2>
+                <div class="account-setting">
+                    <span>登录密码</span>
+                    <a class="account-button" href="{% url 'password_change' %}">修改密码</a>
                 </div>
-            </div>
-            <div>
-                <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.4rem;">用户角色</div>
-                <div style="font-weight: 500; font-size: 0.95rem;">
-                    <span style="background: {% if user.is_superuser %}#fee2e2{% elif profile.role == 'admin' %}#fef3c7{% else %}#d1fae5{% endif %}; color: {% if user.is_superuser %}#991b1b{% elif profile.role == 'admin' %}#92400e{% else %}#065f46{% endif %}; padding: 0.2rem 0.6rem; border-radius: 3px; font-size: 0.85rem;">
-                        {% if user.is_superuser %}
-                            超级管理员
-                        {% elif profile.role == 'admin' %}
-                            管理员
+                <div class="account-setting">
+                    <div class="account-setting-label">
+                        <span>密保问题</span>
+                        {% if profile.has_security_question %}
+                            {% include 'lostfound/components/status.html' with status='active' label='已设置' only %}
                         {% else %}
-                            普通用户
+                            {% include 'lostfound/components/status.html' with status='pending' label='未设置' only %}
                         {% endif %}
-                    </span>
+                    </div>
+                    <a class="account-button" href="{% url 'security_question_set' %}">{% if profile.has_security_question %}修改密保{% else %}设置密保{% endif %}</a>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 可编辑的表单 -->
-    <form method="post">
-        {% csrf_token %}
-        
-        <div style="background: #ffffff; padding: 1.5rem; border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 1.5rem;">
-            <h4 style="margin: 0 0 1.2rem 0; color: var(--text-primary); font-size: 0.95rem; font-weight: 600;">联系信息</h4>
-            
-            <div class="form-group">
-                <label for="{{ form.student_id.id_for_label }}" style="font-size: 0.9rem; font-weight: 500; color: var(--text-primary);">
-                    {{ form.student_id.label }}
-                </label>
-                {{ form.student_id }}
-                {% if form.student_id.errors %}
-                    <ul class="errorlist">
-                        {% for error in form.student_id.errors %}
-                        <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </div>
-
-            <div class="form-group">
-                <label for="{{ form.phone.id_for_label }}" style="font-size: 0.9rem; font-weight: 500; color: var(--text-primary);">
-                    {{ form.phone.label }}
-                </label>
-                {{ form.phone }}
-                {% if form.phone.errors %}
-                    <ul class="errorlist">
-                        {% for error in form.phone.errors %}
-                        <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </div>
-
-            <div class="form-group" style="margin-bottom: 0;">
-                <label for="{{ form.dorm.id_for_label }}" style="font-size: 0.9rem; font-weight: 500; color: var(--text-primary);">
-                    {{ form.dorm.label }}
-                </label>
-                {{ form.dorm }}
-                {% if form.dorm.errors %}
-                    <ul class="errorlist">
-                        {% for error in form.dorm.errors %}
-                        <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </div>
-        </div>
-
-        <div style="display: flex; gap: 1rem;">
-            <button type="submit" class="btn btn-primary" style="flex: 1; padding: 0.75rem;">
-                保存修改
-            </button>
-            <a href="{% url 'home' %}" class="btn btn-secondary" style="flex: 1; text-decoration: none; padding: 0.75rem;">
-                取消
-            </a>
-        </div>
-    </form>
-
-    <!-- 修改密码区域 -->
-    <div style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); padding: 1.5rem; border: 1px solid #fed7aa; border-radius: 4px; margin-top: 2rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h4 style="margin: 0 0 0.5rem 0; color: var(--text-primary); font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
-                    账户安全
-                </h4>
-                <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">定期修改密码可以提高账户安全性</p>
-            </div>
-            <a href="{% url 'password_change' %}" class="btn" style="background: #f97316; color: white; text-decoration: none; padding: 0.6rem 1.5rem; white-space: nowrap;">
-                修改密码
-            </a>
-        </div>
-    </div>
-
-    <!-- 密保问题设置区域 -->
-    <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 1.5rem; border: 1px solid #86efac; border-radius: 4px; margin-top: 1rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="flex: 1;">
-                <h4 style="margin: 0 0 0.5rem 0; color: var(--text-primary); font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
-                    密保问题
-                    {% if profile.has_security_question %}
-                    <span style="background: #22c55e; color: white; padding: 0.15rem 0.5rem; border-radius: 3px; font-size: 0.75rem; font-weight: 500;">已设置</span>
-                    {% else %}
-                    <span style="background: #f59e0b; color: white; padding: 0.15rem 0.5rem; border-radius: 3px; font-size: 0.75rem; font-weight: 500;">未设置</span>
-                    {% endif %}
-                </h4>
-                <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">
-                    {% if profile.has_security_question %}
-                        密保问题可用于找回密码，建议定期更新
-                    {% else %}
-                        设置密保问题后可用于找回密码，提高账户安全性
-                    {% endif %}
-                </p>
-            </div>
-            <a href="{% url 'security_question_set' %}" class="btn" style="background: #22c55e; color: white; text-decoration: none; padding: 0.6rem 1.5rem; white-space: nowrap;">
-                {% if profile.has_security_question %}修改密保{% else %}设置密保{% endif %}
-            </a>
-        </div>
+            </section>
+        </aside>
     </div>
 </div>
-
-<style>
-    .form-group {
-        margin-bottom: 1.2rem;
-    }
-
-    .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-    }
-
-    @media (max-width: 768px) {
-        .card {
-            margin: 1rem !important;
-        }
-        
-        div[style*="display: flex; gap: 1rem"] {
-            flex-direction: column;
-        }
-        
-        div[style*="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr))"] {
-            grid-template-columns: 1fr !important;
-        }
-    }
-</style>
 {% endblock %}

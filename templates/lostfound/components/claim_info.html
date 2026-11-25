@@ -1,0 +1,10 @@
+<aside class="margin-note" aria-labelledby="related-title">
+    <h2 id="related-title">关联失物</h2>
+    <p><a class="inline-action" href="{% url 'lost_item_detail' item.pk %}">{{ item.title }} {% include 'lostfound/components/icon.html' with icon='arrow' only %}</a></p>
+    <dl class="facts">
+        <div><dt>分类</dt><dd>{{ item.get_category_display }}</dd></div>
+        <div><dt>丢失地点</dt><dd>{{ item.lost_location }}</dd></div>
+        <div><dt>丢失时间</dt><dd><time datetime="{{ item.lost_time|date:'c' }}">{{ item.lost_time|date:"Y-m-d H:i" }}</time></dd></div>
+        <div><dt>发布人</dt><dd>{{ item.publish_user.username }}</dd></div>
+    </dl>
+</aside>

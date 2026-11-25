@@ -1,0 +1,6 @@
+<div class="notice-tags">
+    {% if notice.is_pinned %}
+        <span class="state state-pinned">{% include 'lostfound/components/icon.html' with icon='pushpin' only %}置顶</span>
+    {% endif %}
+    <span class="state">{% if notice.school %}{{ notice.school.name }}{% else %}系统公告{% endif %}</span>
+</div>

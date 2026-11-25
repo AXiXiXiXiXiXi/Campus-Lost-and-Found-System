@@ -1,0 +1,23 @@
+<li class="home-notice">
+    <article>
+        <div class="home-notice-heading">
+            <h3><a href="{% url 'notice_detail' notice.pk %}">{{ notice.title }}</a></h3>
+            <div class="home-notice-labels">
+                {% if notice.is_pinned %}
+                    <span class="home-tag home-tag-pinned">{% include 'lostfound/components/icon.html' with icon='pushpin' only %}置顶</span>
+                {% endif %}
+                <span class="home-tag">{% if notice.school %}{{ notice.school.name }}{% else %}系统公告{% endif %}</span>
+            </div>
+        </div>
+        <p class="home-notice-excerpt">{{ notice.content|truncatechars:180 }}</p>
+        <div class="home-notice-footer">
+            <p class="home-byline">{{ notice.publish_user.username }} · <time datetime="{{ notice.create_time|date:'c' }}">{{ notice.create_time|date:"Y-m-d H:i" }}</time></p>
+            {% if can_manage %}
+                <div class="home-actions">
+                    <a class="home-link home-row-action{% if notice.is_pinned %} home-cancel{% endif %}" href="{% url 'notice_toggle_pin' notice.pk %}" aria-label="{% if notice.is_pinned %}取消置顶{% else %}置顶{% endif %}公告：{{ notice.title }}">{% if notice.is_pinned %}取消置顶{% else %}置顶{% endif %}</a>
+                    <a class="home-link home-row-action" href="{% url 'notice_edit' notice.pk %}" aria-label="编辑公告：{{ notice.title }}">编辑</a>
+                </div>
+            {% endif %}
+        </div>
+    </article>
+</li>

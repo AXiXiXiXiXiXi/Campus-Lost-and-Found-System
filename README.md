@@ -1,254 +1,128 @@
-# 校园失物招领系统本地部署说明
+# 校园失物招领系统
 
-本文介绍如何在本地运行本项目。执行命令时，请先进入项目根目录，也就是包含 `manage.py` 和 `requirements.txt` 的目录。
+面向校园的失物招领平台。学生可发布失物和招领信息、上传图片、提交认领申请。校级管理员审核本校申请并发布公告，超级管理员可管理学校范围和用户。
 
-## 一、准备环境
+项目使用 Django 模板渲染页面，部署时使用 MySQL 保存业务数据。
 
-安装以下软件：
+## 本地部署
 
-1. Python 3.12
-2. MySQL 8.0 或更高版本
-3. Git，可选，用于下载项目
+需要 Python 3.12 或 3.13、MySQL 8.x 和 Git。以下命令在项目根目录执行。
 
-下载项目后，进入项目目录：
+### 1. 获取代码并安装依赖
 
-```powershell
-cd "你的项目目录"
-```
+把 `YOUR_GITHUB_REPOSITORY_URL` 换成仓库的克隆地址。已经下载源代码时，直接进入项目根目录即可。
 
-安装完成后，在终端中检查版本：
-
-```powershell
-python --version
-mysql --version
-```
-
-## 二、创建 Python 虚拟环境
-
-在项目根目录执行：
-
-```powershell
+```sh
+git clone YOUR_GITHUB_REPOSITORY_URL campus-lostfound
+cd campus-lostfound
 python -m venv .venv
 ```
 
-激活虚拟环境：
+Windows PowerShell
 
 ```powershell
-.\.venv\Scripts\Activate.ps1
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+Copy-Item .env.example .env
 ```
 
-如果 PowerShell 提示禁止运行脚本，可以为当前窗口临时允许脚本运行：
+macOS 或 Linux
 
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```sh
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+cp .env.example .env
 ```
 
-然后重新执行激活命令。
+Windows 用户请在后续命令中使用 `.\.venv\Scripts\python.exe`，以确保 Django 使用刚安装的项目依赖。
 
-安装项目依赖：
+### 2. 建立 MySQL 数据库
 
-```powershell
-pip install -r requirements.txt
-```
-
-## 三、创建 MySQL 数据库
-
-登录 MySQL：
-
-```powershell
-mysql -u root -p
-```
-
-输入 MySQL 密码后，执行：
+用 MySQL 管理员登录执行以下 SQL。执行前把示例密码替换成独立生成的强密码。
 
 ```sql
 CREATE DATABASE campus_lostfound
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE USER 'campus_app'@'127.0.0.1' IDENTIFIED BY 'REPLACE_WITH_YOUR_PASSWORD';
+
+GRANT ALL PRIVILEGES ON campus_lostfound.*
+  TO 'campus_app'@'127.0.0.1';
 ```
 
-查看数据库是否创建成功：
+### 3. 配置环境变量
 
-```sql
-SHOW DATABASES;
+编辑本地的 `.env`，填写 `DJANGO_SECRET_KEY` 和 `MYSQL_PASSWORD`。如果数据库名称、账号、主机或端口与示例不同，一并更新相应的 `MYSQL_*` 项。
+
+用下面的命令生成 Django 密钥，把结果用单引号包在 `DJANGO_SECRET_KEY=` 后面。数据库密码也可用单引号包起来。
+
+```sh
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 ```
 
-退出 MySQL：
+进程环境里已设置的变量优先于 `.env`。本地开发可沿用示例里的 `DJANGO_DEBUG=true` 和回环地址。真实密钥和数据库密码请保存在本机 `.env` 或部署平台的环境变量里。
 
-```sql
-EXIT;
-```
+如果站点有公开的密码找回联系邮箱，可填写 `CAMPUS_SUPPORT_EMAIL`。留空时，页面会提示联系所在学校的管理员。
 
-## 四、配置数据库连接
+### 4. 迁移、初始化和启动
 
-打开以下文件：
-
-```text
-campus_lostfound/settings.py
-```
-
-找到 `DATABASES` 配置，将数据库名称、用户名、密码、地址和端口修改为本机 MySQL 的实际配置：
-
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'campus_lostfound',
-        'USER': 'root',
-        'PASSWORD': '你的MySQL密码',
-        'HOST': 'localhost',
-        'PORT': '3306',
-    }
-}
-```
-
-请注意：
-
-1. `NAME` 必须与创建的数据库名称一致。
-2. `USER` 和 `PASSWORD` 必须与本地 MySQL 账号一致。
-3. MySQL 使用默认端口时，`PORT` 一般填写 `3306`。
-4. 不要把真实的数据库密码提交到公开仓库。
-
-## 五、创建数据表
-
-在项目根目录执行：
+Windows PowerShell
 
 ```powershell
+.\.venv\Scripts\python.exe manage.py migrate
+.\.venv\Scripts\python.exe manage.py seed_schools
+.\.venv\Scripts\python.exe manage.py createsuperuser
+.\.venv\Scripts\python.exe manage.py runserver
+```
+
+macOS 或 Linux
+
+```sh
 python manage.py migrate
-```
-
-该命令会根据项目中的迁移文件创建 Django 和失物招领系统所需的数据表。
-
-## 六、导入学校基础数据
-
-项目根目录中的 `school.sql` 包含学校基础数据，不包含用户个人信息。
-
-在项目根目录执行：
-
-```powershell
-mysql --default-character-set=utf8mb4 -u root -p campus_lostfound -e "source ./school.sql"
-```
-
-输入 MySQL 密码后等待命令执行完成。
-
-`campus_lostfound.sql` 是数据库表结构备份。正常部署时已经通过 `python manage.py migrate` 创建了数据表，因此不需要再次导入该文件。
-
-## 七、创建管理员账号
-
-执行：
-
-```powershell
+python manage.py seed_schools
 python manage.py createsuperuser
-```
-
-根据提示输入管理员用户名、邮箱和密码。创建完成后，可以使用该账号登录系统后台。
-
-## 八、启动项目
-
-执行：
-
-```powershell
 python manage.py runserver
 ```
 
-终端显示以下地址后，即可在浏览器中访问：
+打开 [本地站点](http://127.0.0.1:8000/)。超级管理员可使用刚创建的账号登录。普通用户通过注册页面搜索并选择所属学校。
 
-```text
-http://127.0.0.1:8000/
-```
+`seed_schools` 导入 83 所学校的名称和代码。重复执行会跳过已有代码，并保留现有学校信息。站点数据库通过迁移创建，学校通过此命令初始化。
 
-Django 管理后台地址：
+## 部署到服务器
 
-```text
-http://127.0.0.1:8000/admin/
-```
+- 在服务器环境变量中配置独立的数据库账号和密钥，设置 `DJANGO_DEBUG=false`，将 `DJANGO_ALLOWED_HOSTS` 改为实际域名。需要额外的 CSRF 信任来源时，在 `DJANGO_CSRF_TRUSTED_ORIGINS` 中填完整来源，例如 `https://campus.example.org`。
+- 执行 `python manage.py migrate` 和 `python manage.py collectstatic --noinput`。第一次部署时，再初始化学校并创建管理员。
+- 使用生产级 WSGI 或 ASGI 服务运行应用，并通过反向代理提供 HTTPS。静态资源由 `staticfiles/` 提供，上传图片存于 `media/`，部署时为上传目录配置持久存储并纳入备份。
+- 上线前运行 `python manage.py check --deploy`，逐项核对实际部署配置。当前管理员重置密码功能使用固定初始密码，公网启用该功能前需要另行处理。
 
-如需让同一局域网内的其他设备访问，可以执行：
+[查看 Django 部署检查清单](https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/)
 
-```powershell
-python manage.py runserver 0.0.0.0:8000
-```
+## 本地数据与版本控制
 
-同时需要在 `settings.py` 的 `ALLOWED_HOSTS` 中加入运行服务器的局域网 IP 地址。
+`.env`、数据库备份和 `media/` 会保留在各自的部署环境。公开仓库包含 `.env.example`、学校初始化数据和 `img/` 中的演示截图。
 
-## 九、常见问题
+## 常见问题
 
-### 1. pip install 安装失败
+- **提示 `No module named 'dotenv'`**。请用项目的 Python 启动 Django。Windows 下可先用 `.\.venv\Scripts\python.exe -m pip install -r requirements.txt` 补齐依赖，再运行 `.\.venv\Scripts\python.exe manage.py runserver`。在 IDE 里运行时，将项目和运行配置的解释器指向 `.venv\Scripts\python.exe`。
+- **数据库连接失败**。检查 MySQL 是否启动，并核对库名、用户名、密码、主机和端口。
+- **注册时学校列表为空**。先执行迁移，再运行 `python manage.py seed_schools`。
+- **站点里看不到旧的物品照片**。页面展示的是本部署环境中新上传的图片。README 截图位于 `img/`。
 
-优先确认使用的是 Python 3.12。部分依赖版本可能不支持其他 Python 版本。
+## 界面预览
 
-可以先升级 pip：
+以下为使用演示账号和演示记录拍摄的当前界面。
 
-```powershell
-python -m pip install --upgrade pip
-```
+| 登录 | 系统管理首页 |
+| --- | --- |
+| ![登录页面](img/01-login-page.png) | ![系统管理首页](img/02-super-admin-dashboard.png) |
 
-然后重新安装依赖：
-
-```powershell
-pip install -r requirements.txt
-```
-
-### 2. 无法连接 MySQL
-
-依次检查以下内容：
-
-1. MySQL 服务是否已经启动。
-2. `settings.py` 中的用户名和密码是否正确。
-3. `campus_lostfound` 数据库是否已经创建。
-4. MySQL 是否允许从 `localhost` 或 `127.0.0.1` 连接。
-5. MySQL 的端口是否被其他程序占用。
-
-### 3. 提示没有 MySQLdb
-
-先确认依赖已经安装：
-
-```powershell
-pip install -r requirements.txt
-```
-
-项目已经通过 PyMySQL 提供 MySQL 数据库驱动，因此不需要额外编写数据库连接代码。
-
-### 4. 页面没有图片
-
-用户上传的图片保存在项目根目录的 `media` 文件夹中。数据库刚导入时没有用户失物信息，因此暂时看不到物品图片属于正常现象。用户发布带图片的信息后，图片会自动保存到该目录。
-
-### 5. 修改代码后数据表没有变化
-
-修改模型后，需要依次执行：
-
-```powershell
-python manage.py makemigrations
-python manage.py migrate
-```
-
-## 十、后续启动
-
-完成首次部署后，以后启动项目只需要进入项目目录，激活虚拟环境，然后运行：
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-python manage.py runserver
-```
-
-## 十一、系统界面预览
-
-系统涵盖账号登录、校园数据隔离、失物与招领信息发布、在线认领审批、公告管理以及超级管理员管理等功能。下图为各核心页面预览：
-
-| 登录页面 | 超级管理员首页 |
-| :---: | :---: |
-| ![登录页面](img/01-login-page.png) | ![超级管理员首页](img/02-super-admin-dashboard.png) |
-
-| 失物信息列表 | 招领信息列表 |
-| :---: | :---: |
+| 失物信息 | 招领信息 |
+| --- | --- |
 | ![失物信息列表](img/03-lost-items-list.png) | ![招领信息列表](img/04-found-items-list.png) |
 
-| 认领申请管理 | 公告管理 |
-| :---: | :---: |
-| ![认领申请管理](img/05-claim-applications.png) | ![公告管理](img/06-announcement-management.png) |
+| 认领申请 | 公告 |
+| --- | --- |
+| ![认领申请列表](img/05-claim-applications.png) | ![校园公告列表](img/06-announcement-management.png) |
 
-| 用户管理 | |
-| :---: | :---: |
-| ![用户管理](img/07-user-management.png) | |
-
-> 截图中的部分账号信息已进行遮挡处理。
+| 用户管理 |
+| --- |
+| ![用户管理](img/07-user-management.png) |

@@ -1,68 +1,55 @@
 {% extends 'lostfound/base.html' %}
+{% load static %}
 
-{% block title %}{{ found_item.title }} - 招领详情{% endblock %}
+{% block title %}{{ found_item.title }} · 校园失物招领{% endblock %}
 
-{% block content %}
-<div class="card" style="max-width: 900px; margin: 0 auto;">
-    <div style="margin-bottom: 2rem;">
-        <a href="{% url 'found_item_list' %}" style="color: #667eea; text-decoration: none;">← 返回招领列表</a>
-    </div>
-
-    <h2 style="color: #333; margin-bottom: 1rem;">{{ found_item.title }}</h2>
-    
-    <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
-        <span style="background: #e8f5e9; color: #2e7d32; padding: 0.5rem 1rem; border-radius: 4px;">
-            {{ found_item.get_category_display }}
-        </span>
-    </div>
-
-    {% if found_item.image %}
-    <div style="margin-bottom: 2rem;">
-        <img src="{{ found_item.image.url }}" alt="{{ found_item.title }}" 
-             style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
-    </div>
-    {% endif %}
-
-    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-        <h3 style="color: #333; margin-bottom: 1rem;">📝 详细描述</h3>
-        <p style="color: #666; line-height: 1.8; white-space: pre-wrap;">{{ found_item.description }}</p>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem;">
-        <div style="background: white; border: 1px solid #e0e0e0; padding: 1rem; border-radius: 8px;">
-            <div style="color: #999; font-size: 0.9rem; margin-bottom: 0.25rem;">拾取时间</div>
-            <div style="color: #333; font-weight: 500;">{{ found_item.found_time|date:"Y-m-d H:i" }}</div>
-        </div>
-        <div style="background: white; border: 1px solid #e0e0e0; padding: 1rem; border-radius: 8px;">
-            <div style="color: #999; font-size: 0.9rem; margin-bottom: 0.25rem;">拾取地点</div>
-            <div style="color: #333; font-weight: 500;">{{ found_item.found_location }}</div>
-        </div>
-        <div style="background: white; border: 1px solid #e0e0e0; padding: 1rem; border-radius: 8px;">
-            <div style="color: #999; font-size: 0.9rem; margin-bottom: 0.25rem;">联系方式</div>
-            <div style="color: #333; font-weight: 500;">{{ found_item.contact }}</div>
-        </div>
-        <div style="background: white; border: 1px solid #e0e0e0; padding: 1rem; border-radius: 8px;">
-            <div style="color: #999; font-size: 0.9rem; margin-bottom: 0.25rem;">发布人</div>
-            <div style="color: #333; font-weight: 500;">{{ found_item.publish_user.username }}</div>
-        </div>
-        <div style="background: white; border: 1px solid #e0e0e0; padding: 1rem; border-radius: 8px;">
-            <div style="color: #999; font-size: 0.9rem; margin-bottom: 0.25rem;">所属学校</div>
-            <div style="color: #667eea; font-weight: 500;">{{ found_item.school.name }}</div>
-        </div>
-        <div style="background: white; border: 1px solid #e0e0e0; padding: 1rem; border-radius: 8px;">
-            <div style="color: #999; font-size: 0.9rem; margin-bottom: 0.25rem;">发布时间</div>
-            <div style="color: #333; font-weight: 500;">{{ found_item.create_time|date:"Y-m-d H:i" }}</div>
-        </div>
-    </div>
-
-    <div style="display: flex; gap: 1rem;">
-        {% if found_item.publish_user == user %}
-        <a href="{% url 'found_item_edit' found_item.pk %}" class="btn btn-primary" style="flex: 1; text-align: center;">✏️ 编辑</a>
-        <a href="{% url 'found_item_delete' found_item.pk %}" class="btn btn-secondary" style="flex: 1; text-align: center;">🗑️ 删除</a>
-        {% elif user.profile.role == 'admin' %}
-        <a href="{% url 'found_item_delete' found_item.pk %}" class="btn btn-secondary" style="flex: 1; text-align: center;">🗑️ 删除（管理员）</a>
-        {% endif %}
-    </div>
-</div>
+{% block page_styles %}
+<link rel="stylesheet" href="{% static 'lostfound/details.css' %}?v=2">
 {% endblock %}
 
+{% block content %}
+{% with item=found_item %}
+<article class="entry-detail">
+    <header class="entry-detail-header">
+        <a class="entry-detail-back" href="{% url 'found_item_list' %}">{% include 'lostfound/components/icon.html' with icon='back' only %}返回招领列表</a>
+        <div class="entry-detail-heading">
+            <h1>{{ item.title }}</h1>
+            {% include 'lostfound/components/status.html' with status=item.status label=item.get_status_display only %}
+        </div>
+    </header>
+
+    <div class="entry-detail-grid">
+        <section class="entry-detail-panel" aria-labelledby="item-description">
+            <h2 id="item-description">物品描述</h2>
+            <p class="entry-detail-copy">{{ item.description }}</p>
+            <div class="entry-detail-group">
+                <h3>物品图片</h3>
+                {% include 'lostfound/components/item_image.html' with item=item only %}
+            </div>
+        </section>
+
+        <section class="entry-detail-panel" aria-labelledby="item-facts">
+            <h2 id="item-facts">物品信息</h2>
+            <dl class="entry-detail-facts">
+                <div><dt>分类</dt><dd>{{ item.get_category_display }}</dd></div>
+                <div><dt>所属学校</dt><dd>{{ item.school.name }}</dd></div>
+                <div><dt>拾取地点</dt><dd>{{ item.found_location }}</dd></div>
+                <div><dt>拾取时间</dt><dd><time datetime="{{ item.found_time|date:'c' }}">{{ item.found_time|date:"Y-m-d H:i" }}</time></dd></div>
+                <div><dt>发布人</dt><dd>{{ item.publish_user.username }}</dd></div>
+                <div><dt>发布时间</dt><dd><time datetime="{{ item.create_time|date:'c' }}">{{ item.create_time|date:"Y-m-d H:i" }}</time></dd></div>
+                <div><dt>联系方式</dt><dd>{{ item.contact }}</dd></div>
+            </dl>
+        </section>
+    </div>
+
+    {% if item.publish_user == user or user.profile.role == 'admin' %}
+        <footer class="entry-detail-actions">
+            {% if item.publish_user == user %}
+                <a class="entry-detail-button" href="{% url 'found_item_edit' item.pk %}">编辑信息</a>
+            {% endif %}
+            <a class="entry-detail-button entry-detail-button-danger" href="{% url 'found_item_delete' item.pk %}">删除信息</a>
+        </footer>
+    {% endif %}
+</article>
+{% endwith %}
+{% endblock %}

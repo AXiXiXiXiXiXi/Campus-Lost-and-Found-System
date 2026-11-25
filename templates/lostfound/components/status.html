@@ -1,0 +1,1 @@
+<span class="state{% if status == 'rejected' or status == 'disabled' %} state-negative{% elif status == 'pending' or status == 'unclaimed' %} state-open{% elif status == 'claimed' or status == 'returned' or status == 'approved' or status == 'active' %} state-complete{% endif %}">{{ label }}</span>

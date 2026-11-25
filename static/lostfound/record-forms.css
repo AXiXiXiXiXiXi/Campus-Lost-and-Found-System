@@ -1,0 +1,173 @@
+.record-page {
+    display: grid;
+    gap: var(--space-5);
+    container-type: inline-size;
+    max-inline-size: 48rem;
+    min-inline-size: 0;
+    color: var(--form-text);
+    font: .875rem/1.55 var(--form-font);
+    overflow-wrap: anywhere;
+}
+
+.record-page-reading { max-inline-size: 72rem; }
+.record-page-compact { max-inline-size: 34rem; }
+
+.record-heading {
+    display: grid;
+    gap: var(--space-1);
+    min-inline-size: 0;
+}
+
+.record-heading h1 {
+    color: var(--form-heading);
+    font: var(--page-title-font);
+}
+
+.record-subtitle { color: var(--form-muted); }
+
+.record-back {
+    display: inline-flex;
+    align-items: center;
+    justify-self: start;
+    gap: var(--space-2);
+    min-block-size: var(--form-control-height);
+    max-inline-size: 100%;
+    margin-inline-start: calc(-1 * var(--space-2));
+    padding: var(--space-2);
+    border-radius: var(--form-control-radius);
+    color: var(--form-text);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color var(--form-transition), color var(--form-transition);
+}
+
+.record-back:hover { background: var(--form-hover); color: var(--form-heading); }
+.record-back:active { background: var(--form-border); }
+
+.record-layout,
+.record-stack {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-4);
+    min-inline-size: 0;
+}
+
+.record-page :is(.record-panel, .margin-note) {
+    display: grid;
+    gap: var(--space-3);
+    min-inline-size: 0;
+    padding: var(--form-panel-padding);
+    border: 1px solid var(--form-border);
+    border-radius: var(--form-panel-radius);
+    background: var(--form-surface);
+}
+
+.record-page :is(.editor, .record-panel, .margin-note) > h2 {
+    margin: 0;
+    color: var(--form-heading);
+    font: var(--section-title-font);
+}
+
+.record-copy {
+    line-height: 1.7;
+    white-space: pre-wrap;
+}
+
+.record-facts,
+.record-page .margin-note .facts {
+    display: grid;
+    gap: var(--space-3);
+    min-inline-size: 0;
+}
+
+.record-facts > div,
+.record-page .margin-note .facts > div {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: var(--space-2);
+    padding: 0;
+    border: 0;
+}
+
+.record-page :is(.record-facts, .margin-note .facts) dt { color: var(--form-muted); }
+
+.record-page .margin-note .inline-action {
+    min-block-size: var(--form-control-height);
+    background: transparent;
+    color: var(--form-primary-hover);
+}
+
+.record-page .margin-note .inline-action:hover { color: var(--form-primary); }
+
+.record-page .form-grid { grid-template-columns: minmax(0, 1fr); }
+
+.record-page .editor .form-section > legend {
+    font: 650 1rem/1.5 var(--form-font);
+}
+
+.record-upload {
+    min-inline-size: 0;
+    padding: var(--space-3);
+    border: 1px solid var(--form-border);
+    border-radius: var(--form-control-radius);
+    background: var(--form-canvas);
+}
+
+.record-upload input[type="file"] {
+    inline-size: 100%;
+    min-inline-size: 0;
+}
+
+.record-page .editor .check-field {
+    justify-self: start;
+    max-inline-size: 100%;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--form-control-border);
+    border-radius: var(--form-control-radius);
+    cursor: pointer;
+    transition: background-color var(--form-transition), border-color var(--form-transition);
+}
+
+.record-page .editor .check-field:hover { background: var(--form-hover); }
+
+.record-page .editor .check-field:has(input:checked) {
+    border-color: var(--form-primary);
+    background: var(--form-primary-soft);
+}
+
+.record-page .form-choice > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+}
+
+.record-page .form-choice label { block-size: 100%; }
+
+.record-actions { justify-content: flex-end; }
+
+.record-confirmation {
+    display: grid;
+    gap: var(--space-4);
+}
+
+.record-confirm-question {
+    color: var(--form-heading);
+    font-size: 1rem;
+}
+
+.record-confirmation .feedback-error { margin: 0; }
+
+@container (min-width: 34rem) {
+    .record-page .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@container (min-width: 44rem) {
+    .record-layout { grid-template-columns: minmax(0, 1fr) minmax(16rem, .55fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .record-page :where(*) { transition: none !important; }
+}

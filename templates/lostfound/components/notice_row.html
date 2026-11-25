@@ -1,0 +1,18 @@
+<li>
+    <article class="list-row list-notice">
+        <div class="list-notice-head">
+            <h3><a class="list-title-link" href="{% url 'notice_detail' notice.pk %}">{{ notice.title }}</a></h3>
+            {% include 'lostfound/components/notice_badges.html' with notice=notice only %}
+        </div>
+        <p>{{ notice.content|truncatechars:180 }}</p>
+        <div class="list-notice-footer">
+            <p class="list-meta">发布人 {{ notice.publish_user.username }} · <time datetime="{{ notice.create_time|date:'c' }}">{{ notice.create_time|date:"Y-m-d H:i" }}</time></p>
+            {% if can_manage %}
+                <div class="list-actions">
+                    <a class="list-action{% if notice.is_pinned %} list-cancel{% endif %}" href="{% url 'notice_toggle_pin' notice.pk %}" aria-label="{% if notice.is_pinned %}取消置顶{% else %}置顶{% endif %}公告：{{ notice.title }}">{% if notice.is_pinned %}取消置顶{% else %}置顶{% endif %}</a>
+                    <a class="list-action" href="{% url 'notice_edit' notice.pk %}" aria-label="编辑公告：{{ notice.title }}">编辑</a>
+                </div>
+            {% endif %}
+        </div>
+    </article>
+</li>

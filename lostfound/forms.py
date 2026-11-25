@@ -9,24 +9,24 @@ class UserRegisterForm(forms.Form):
         max_length=150,
         min_length=3,
         label='用户名',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '请输入用户名（3-150个字符）'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '请输入用户名（3-150个字符）', 'autocomplete': 'username'})
     )
     password = forms.CharField(
         max_length=20,
         min_length=6,
         label='密码',
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '请输入密码（6-20位）'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '请输入密码（6-20位）', 'autocomplete': 'new-password'})
     )
     password_confirm = forms.CharField(
         max_length=20,
         min_length=6,
         label='确认密码',
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '请再次输入密码（6-20位）'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '请再次输入密码（6-20位）', 'autocomplete': 'new-password'})
     )
     email = forms.EmailField(
         required=True,
         label='邮箱',
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': '请输入邮箱'})
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': '请输入邮箱', 'autocomplete': 'email'})
     )
     school = forms.ModelChoiceField(
         queryset=School.objects.all(),
@@ -38,7 +38,7 @@ class UserRegisterForm(forms.Form):
         max_length=20,
         required=False,
         label='联系电话',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '请输入联系电话'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '请输入联系电话', 'autocomplete': 'tel'})
     )
     student_id = forms.CharField(
         max_length=50,
@@ -126,12 +126,12 @@ class UserLoginForm(forms.Form):
     username = forms.CharField(
         max_length=150,
         label='用户名',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '请输入用户名'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '请输入用户名', 'autocomplete': 'username'})
     )
     password = forms.CharField(
         max_length=128,
         label='密码',
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '请输入密码'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '请输入密码', 'autocomplete': 'current-password'})
     )
 
 
@@ -247,7 +247,7 @@ class ProfileEditForm(forms.Form):
         max_length=20,
         required=False,
         label='联系电话',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '请输入联系电话'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '请输入联系电话', 'autocomplete': 'tel'})
     )
     dorm = forms.CharField(
         max_length=100,
@@ -284,17 +284,17 @@ class PasswordChangeForm(forms.Form):
     old_password = forms.CharField(
         max_length=128,
         label='当前密码',
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '请输入当前密码'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '请输入当前密码', 'autocomplete': 'current-password'})
     )
     new_password = forms.CharField(
         max_length=128,
         label='新密码',
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '请输入新密码'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '请输入新密码', 'autocomplete': 'new-password'})
     )
     new_password_confirm = forms.CharField(
         max_length=128,
         label='确认新密码',
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '请再次输入新密码'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '请再次输入新密码', 'autocomplete': 'new-password'})
     )
 
     def __init__(self, *args, **kwargs):
@@ -331,7 +331,7 @@ class ForgotPasswordStep1Form(forms.Form):
     username = forms.CharField(
         max_length=150,
         label='用户名',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '请输入您的用户名'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '请输入您的用户名', 'autocomplete': 'username'})
     )
 
     def clean_username(self):
@@ -355,12 +355,12 @@ class ForgotPasswordSecurityForm(forms.Form):
     new_password = forms.CharField(
         max_length=128,
         label='新密码',
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '请输入新密码'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '请输入新密码', 'autocomplete': 'new-password'})
     )
     new_password_confirm = forms.CharField(
         max_length=128,
         label='确认新密码',
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '请再次输入新密码'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '请再次输入新密码', 'autocomplete': 'new-password'})
     )
 
     def __init__(self, *args, **kwargs):

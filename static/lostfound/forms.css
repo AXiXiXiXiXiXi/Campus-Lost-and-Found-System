@@ -1,0 +1,363 @@
+:root {
+    --form-surface: var(--surface);
+    --form-canvas: var(--background);
+    --form-heading: var(--heading);
+    --form-text: var(--text);
+    --form-muted: var(--muted);
+    --form-border: var(--border);
+    --form-control-border: var(--input-border);
+    --form-hover: var(--hover);
+    --form-primary: var(--primary);
+    --form-primary-hover: var(--primary-hover);
+    --form-primary-pressed: var(--primary-pressed);
+    --form-primary-soft: var(--selected);
+    --form-ring: var(--focus-ring);
+    --form-danger: var(--danger);
+    --form-danger-hover: var(--danger-hover);
+    --form-danger-soft: var(--danger-soft);
+    --form-danger-border: var(--danger-border);
+    --form-control-radius: var(--corner-control);
+    --form-panel-radius: var(--corner-card);
+    --form-control-height: var(--control-size);
+    --form-panel-padding: var(--panel-padding);
+    --form-field-gap: var(--space-4);
+    --form-section-gap: var(--space-6);
+    --form-transition: var(--transition-ui);
+    --form-font: var(--font-interface);
+}
+
+.editor,
+.filter-line,
+.auth-sheet,
+.delete-page {
+    color: var(--form-text);
+    font-family: var(--form-font);
+    font-size: .875rem;
+    line-height: 1.55;
+    min-inline-size: 0;
+    border: 1px solid var(--form-border);
+    border-radius: var(--form-panel-radius);
+    background: var(--form-surface);
+}
+
+.editor,
+.auth-sheet,
+.delete-page {
+    gap: var(--form-section-gap);
+    padding: var(--form-panel-padding);
+}
+
+.filter-line {
+    gap: var(--form-field-gap);
+    padding: 1rem;
+}
+
+.form-page > .page-heading,
+.page-body:has(> .reading-layout .editor) > .page-heading,
+.auth-sheet > .page-heading {
+    gap: .25rem;
+    padding-block-end: 0;
+    border: 0;
+    font-family: var(--form-font);
+}
+
+:is(.form-page, .auth-sheet) > .page-heading h1,
+.page-body:has(> .reading-layout .editor) > .page-heading h1 {
+    color: var(--form-heading);
+    font: var(--page-title-font);
+}
+
+.editor > h2,
+.auth-sheet .document-section > h2 {
+    color: var(--form-heading);
+    font: 650 1.125rem/1.5rem var(--form-font);
+}
+
+.page-body:has(> .auth-sheet) {
+    padding-block-start: clamp(1.5rem, 4vw, 3rem);
+}
+
+body:has(> .workspace > main > .auth-sheet) {
+    background: var(--form-canvas);
+}
+
+.auth-sheet > .editor {
+    padding: 0;
+    border: 0;
+}
+
+.auth-sheet .auth-bottom {
+    border-block-start-color: var(--form-border);
+    color: var(--form-muted);
+}
+
+.editor .form-stack,
+.editor .form-grid {
+    gap: var(--form-field-gap);
+}
+
+.editor .form-section {
+    gap: var(--form-field-gap);
+}
+
+.editor .form-section > legend {
+    margin-block-end: .75rem;
+    padding-block-start: 1rem;
+    border-block-start-color: var(--form-border);
+    color: var(--form-heading);
+    font-size: 1rem;
+    line-height: 1.5rem;
+}
+
+.editor .form-section:first-of-type > legend {
+    padding-block-start: 0;
+    border-block-start: 0;
+}
+
+:is(.editor, .filter-line) .form-field {
+    gap: .375rem;
+}
+
+:is(.editor, .filter-line) .form-field > label,
+.editor .form-choice legend {
+    color: var(--form-heading);
+    font-size: .875rem;
+    font-weight: 600;
+}
+
+.editor .form-field > label::after,
+.editor .form-choice legend::after {
+    color: var(--form-danger);
+}
+
+:is(.editor, .filter-line) input:not([type="hidden"], [type="checkbox"], [type="radio"]),
+:is(.editor, .filter-line) :is(select, textarea) {
+    min-block-size: var(--form-control-height);
+    padding: .5rem .75rem;
+    border: 1px solid var(--form-control-border);
+    border-radius: var(--form-control-radius);
+    background: var(--form-surface);
+    color: var(--form-heading);
+    font-size: var(--input-text-size);
+    line-height: 1.4;
+    transition: background-color var(--form-transition), border-color var(--form-transition), box-shadow var(--form-transition);
+}
+
+:is(.editor, .filter-line) :is(input, textarea)::placeholder {
+    color: var(--form-muted);
+}
+
+.editor textarea {
+    min-block-size: 7rem;
+    line-height: 1.5;
+}
+
+.editor input[type="file"] {
+    padding: .25rem .5rem;
+}
+
+.editor input::file-selector-button {
+    min-block-size: calc(var(--form-control-height) - .625rem);
+    margin-inline-end: .75rem;
+    padding-inline: .625rem;
+    border-color: var(--form-border);
+    border-radius: var(--form-control-radius);
+    background: var(--form-hover);
+    color: var(--form-text);
+    transition: background-color var(--form-transition);
+}
+
+.editor input::file-selector-button:hover {
+    background: var(--form-border);
+}
+
+.editor :is(input, select, textarea):disabled {
+    background: var(--form-hover);
+    color: var(--form-muted);
+    cursor: default;
+}
+
+:is(.editor, .filter-line) .form-field [aria-invalid="true"] {
+    border-color: var(--form-danger);
+}
+
+:is(.editor, .filter-line) :is(input, select, textarea):focus {
+    border-color: var(--form-primary);
+    box-shadow: 0 0 0 3px var(--form-ring);
+}
+
+.editor :is(input[type="checkbox"], input[type="radio"]) {
+    accent-color: var(--form-primary);
+    box-shadow: none;
+}
+
+.editor :is(.check-field, .form-choice label) {
+    min-block-size: var(--form-control-height);
+}
+
+.editor .form-choice label {
+    padding: .5rem .75rem;
+    border-color: var(--form-control-border);
+    border-radius: var(--form-control-radius);
+    transition: background-color var(--form-transition), border-color var(--form-transition);
+}
+
+.editor .form-choice label:hover {
+    background: var(--form-hover);
+}
+
+.editor .form-choice label:has(input:checked) {
+    border-color: var(--form-primary);
+    background: var(--form-primary-soft);
+}
+
+.editor .helper,
+.filter-line .filter-scope {
+    color: var(--form-muted);
+}
+
+.editor .form-field > .errorlist {
+    padding-inline-start: 0;
+    list-style: none;
+    color: var(--form-danger);
+}
+
+.editor .form-field > .errorlist li + li {
+    margin-block-start: .25rem;
+}
+
+.editor .validation,
+.delete-page .feedback-error {
+    padding: .75rem 1rem;
+    border-color: var(--form-danger-border);
+    border-radius: var(--form-panel-radius);
+    background: var(--form-danger-soft);
+    color: var(--form-danger);
+}
+
+.editor .validation h2 {
+    font-weight: 650;
+}
+
+:is(.editor, .delete-page) .form-end {
+    gap: .5rem;
+    padding-block-start: 1rem;
+    border-block-start-color: var(--form-border);
+}
+
+:is(.editor, .filter-line, .auth-sheet, .delete-page) .action {
+    min-block-size: var(--form-control-height);
+    padding: .5rem .875rem;
+    border-radius: var(--form-control-radius);
+    font-weight: 600;
+    transition: background-color var(--form-transition), border-color var(--form-transition), color var(--form-transition);
+}
+
+:is(.editor, .auth-sheet) .action-primary {
+    border-color: var(--form-primary);
+    background: var(--form-primary);
+    color: var(--form-surface);
+}
+
+:is(.editor, .auth-sheet) .action-primary:hover {
+    border-color: var(--form-primary-hover);
+    background: var(--form-primary-hover);
+}
+
+:is(.editor, .auth-sheet) .action-primary:active {
+    border-color: var(--form-primary-pressed);
+    background: var(--form-primary-pressed);
+}
+
+:is(.editor, .filter-line, .delete-page) .action-outline {
+    border-color: var(--form-control-border);
+    background: var(--form-surface);
+    color: var(--form-text);
+}
+
+:is(.editor, .filter-line, .delete-page) .action-outline:hover {
+    background: var(--form-hover);
+}
+
+:is(.editor, .filter-line, .delete-page) .action-outline:active {
+    background: var(--form-border);
+}
+
+:is(.editor, .delete-page) .form-end a.action-outline {
+    color: var(--form-danger);
+}
+
+:is(.editor, .delete-page) .form-end a.action-outline:is(:hover, :active) {
+    border-color: var(--form-danger-border);
+    background: var(--form-danger-soft);
+}
+
+.delete-page .action-danger {
+    border-color: var(--form-danger);
+    background: var(--form-danger);
+    color: var(--form-surface);
+}
+
+.delete-page .action-danger:is(:hover, :active) {
+    border-color: var(--form-danger-hover);
+    background: var(--form-danger-hover);
+}
+
+:is(.editor, .filter-line, .auth-sheet, .delete-page) .action:disabled {
+    border-color: var(--form-border);
+    background: var(--form-hover);
+    color: var(--muted-on-hover);
+}
+
+:is(.editor, .filter-line, .auth-sheet, .delete-page) .inline-action,
+.auth-sheet .back-link {
+    color: var(--form-primary-hover);
+    text-decoration: none;
+}
+
+:is(.editor, .filter-line, .auth-sheet, .delete-page) .inline-action:hover,
+.auth-sheet .back-link:hover {
+    background: transparent;
+    text-decoration: underline;
+}
+
+.auth-sheet .step-list li[aria-current] {
+    border-color: var(--form-primary);
+    color: var(--form-primary-hover);
+}
+
+.editor .school-options {
+    padding: .375rem;
+    border-color: var(--form-border);
+    border-radius: var(--form-panel-radius);
+    background: var(--form-surface);
+    box-shadow: 0 2px 8px rgb(17 24 39 / .07);
+}
+
+.editor .school-count {
+    color: var(--form-muted);
+}
+
+.editor .school-matches [role="option"] {
+    min-block-size: var(--form-control-height);
+    border: 0;
+    border-radius: var(--form-control-radius);
+    color: var(--form-text);
+    transition: background-color var(--form-transition);
+}
+
+.editor .school-matches [role="option"]:hover {
+    background: var(--form-hover);
+}
+
+.editor .school-matches [aria-selected="true"],
+.editor .school-matches [aria-selected="true"]:hover {
+    background: var(--form-primary-soft);
+    color: var(--form-primary-hover);
+}
+
+@media (min-width: 42rem) {
+    .auth-sheet-wide .form-stack:has(> .school-lookup:not([hidden])) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

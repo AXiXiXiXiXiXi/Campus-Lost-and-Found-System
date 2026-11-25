@@ -1,0 +1,52 @@
+<li>
+    <article class="list-row list-item">
+        <div class="list-item-main">
+            {% include 'lostfound/components/item_image.html' with item=item thumbnail=True only %}
+            <div class="list-summary">
+                <h3><a class="list-title-link" href="{% url detail_route item.pk %}">{{ item.title }} {% include 'lostfound/components/icon.html' with icon='arrow' only %}</a></h3>
+                <p class="list-meta">{{ item.get_category_display }}</p>
+                <p>{{ item.description|truncatechars:150 }}</p>
+                <p class="list-meta">发布人 {{ item.publish_user.username }} · <time datetime="{{ item.create_time|date:'c' }}">{{ item.create_time|date:"Y-m-d" }}</time></p>
+            </div>
+        </div>
+
+        <dl class="list-facts">
+            {% if found %}
+                <div><dt>拾取地点</dt><dd>{{ location }}</dd></div>
+                <div><dt>拾取时间</dt><dd><time datetime="{{ event_time|date:'c' }}">{{ event_time|date:"Y-m-d H:i" }}</time></dd></div>
+            {% else %}
+                <div><dt>丢失地点</dt><dd>{{ location }}</dd></div>
+                <div><dt>丢失时间</dt><dd><time datetime="{{ event_time|date:'c' }}">{{ event_time|date:"Y-m-d H:i" }}</time></dd></div>
+            {% endif %}
+            {% if is_superuser %}<div><dt>学校</dt><dd>{{ item.school.name }}</dd></div>{% endif %}
+        </dl>
+
+        <div class="list-row-tools">
+            {% include 'lostfound/components/status.html' with status=item.status label=item.get_status_display only %}
+            {% if found %}
+                {% if is_admin %}
+                    <details class="list-status-menu">
+                        <summary class="list-action">更新状态<span class="screen-reader">：{{ item.title }}</span>{% include 'lostfound/components/icon.html' with icon='chevron' only %}</summary>
+                        <div class="list-actions">
+                            <form method="post" action="{% url 'found_item_admin_mark_status' item.pk %}" data-confirm="将此招领信息标记为待认领？">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="unclaimed">
+                                <button class="list-button" type="submit"{% if item.status == 'unclaimed' %} disabled{% endif %}>标记待认领</button>
+                            </form>
+                            <form method="post" action="{% url 'found_item_admin_mark_status' item.pk %}" data-confirm="将此招领信息标记为已归还？">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="returned">
+                                <button class="list-button" type="submit"{% if item.status == 'returned' %} disabled{% endif %}>标记已归还</button>
+                            </form>
+                        </div>
+                    </details>
+                {% elif item.publish_user == request.user and item.status == 'unclaimed' %}
+                    <form method="post" action="{% url 'found_item_mark_returned' item.pk %}" data-confirm="确认标记为已归还？此操作不可撤销。">
+                        {% csrf_token %}
+                        <button class="list-button" type="submit">标记为已归还</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+        </div>
+    </article>
+</li>

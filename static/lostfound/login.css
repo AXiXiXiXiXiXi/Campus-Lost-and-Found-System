@@ -1,0 +1,234 @@
+:root {
+    --login-background: var(--background);
+    --login-surface: var(--surface);
+    --login-heading: var(--heading);
+    --login-text: var(--text);
+    --login-muted: var(--muted);
+    --login-border: var(--border);
+    --login-input-border: var(--input-border);
+    --login-primary: var(--primary);
+    --login-primary-hover: var(--primary-hover);
+    --login-primary-pressed: var(--primary-pressed);
+    --login-selected: var(--selected);
+    --login-hover: var(--hover);
+    --login-ring: var(--focus-ring);
+    --login-danger: var(--danger);
+    --login-control-radius: var(--corner-control);
+    --login-control-height: var(--control-size);
+    --login-transition: var(--transition-ui);
+    --login-font: var(--font-interface);
+}
+
+body {
+    background: var(--login-background);
+    color: var(--login-text);
+    font-family: var(--login-font);
+    font-size: .875rem;
+    line-height: 1.55;
+}
+
+.masthead {
+    border-block-end-color: var(--login-border);
+    background: var(--login-surface);
+}
+
+.masthead .masthead-inner {
+    min-block-size: 3.5rem;
+    padding-block: .25rem;
+}
+
+.masthead .wordmark {
+    color: var(--login-heading);
+    font: 700 1rem/1.5 var(--login-font);
+    min-block-size: var(--login-control-height);
+}
+
+.masthead .guest-links {
+    gap: .25rem;
+}
+
+.masthead .guest-links a {
+    min-block-size: var(--login-control-height);
+    padding-inline: .75rem;
+    border-radius: var(--login-control-radius);
+    color: var(--login-text);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color var(--login-transition), color var(--login-transition);
+}
+
+.masthead .guest-links a:hover {
+    background: var(--login-hover);
+}
+
+.masthead .guest-links a[aria-current="page"] {
+    background: var(--login-selected);
+    color: var(--login-primary-hover);
+}
+
+.colophon {
+    border-block-start-color: var(--login-border);
+}
+
+.colophon .colophon-inner {
+    color: var(--login-muted);
+    font-size: .75rem;
+}
+
+.colophon nav a {
+    color: var(--login-muted);
+    font-size: .75rem;
+    text-decoration: none;
+}
+
+.colophon nav a:hover {
+    color: var(--login-primary-hover);
+    text-decoration: underline;
+}
+
+.site-width.workspace:has(> main > .login-card) {
+    display: grid;
+}
+
+.page-body:has(> .login-card) {
+    display: grid;
+    grid-template-columns: minmax(0, 27rem);
+    justify-content: center;
+    align-content: center;
+    gap: 1rem;
+    padding-block: 2rem;
+}
+
+.login-card {
+    min-inline-size: 0;
+    padding: var(--panel-padding);
+    border: 1px solid var(--login-border);
+    border-radius: .5rem;
+    background: var(--login-surface);
+}
+
+.login-heading {
+    display: grid;
+    gap: .5rem;
+    margin-block-end: 1.5rem;
+}
+
+.login-heading h1 {
+    color: var(--login-heading);
+    font: var(--page-title-font);
+}
+
+.login-heading p,
+.login-footer {
+    color: var(--login-muted);
+}
+
+.login-form,
+.login-fields {
+    display: grid;
+    gap: 1rem;
+    min-inline-size: 0;
+}
+
+.login-card .form-field > label {
+    color: var(--login-heading);
+    font-size: .875rem;
+    font-weight: 600;
+}
+
+.login-card .form-field > label::after,
+.login-card .form-field > .errorlist {
+    color: var(--login-danger);
+}
+
+.login-card :is(input[type="text"], input[type="password"]) {
+    min-block-size: var(--login-control-height);
+    padding: .5rem .75rem;
+    border: 1px solid var(--login-input-border);
+    border-radius: var(--login-control-radius);
+    background: var(--login-surface);
+    color: var(--login-heading);
+    font-size: var(--input-text-size);
+    line-height: 1.4;
+    transition: border-color var(--login-transition), box-shadow var(--login-transition);
+}
+
+.login-card input::placeholder {
+    color: var(--login-muted);
+}
+
+.login-card [data-invalid] input {
+    border-color: var(--login-danger);
+}
+
+.login-card :is(input[type="text"], input[type="password"]):focus {
+    border-color: var(--login-primary);
+    box-shadow: 0 0 0 3px var(--login-ring);
+}
+
+.login-link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--login-control-height);
+    color: var(--login-primary-hover);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.login-link:is(:hover, :focus-visible) {
+    color: var(--login-primary-hover);
+    text-decoration: underline;
+}
+
+.login-recovery {
+    justify-self: end;
+    margin-block-start: -.5rem;
+}
+
+.login-submit {
+    min-block-size: var(--login-control-height);
+    padding: .5rem .75rem;
+    border: 1px solid var(--login-primary);
+    border-radius: var(--login-control-radius);
+    background: var(--login-primary);
+    color: var(--login-surface);
+    font-weight: 600;
+    transition: background-color var(--login-transition), border-color var(--login-transition);
+}
+
+.login-submit:hover {
+    border-color: var(--login-primary-hover);
+    background: var(--login-primary-hover);
+}
+
+.login-submit:active {
+    border-color: var(--login-primary-pressed);
+    background: var(--login-primary-pressed);
+}
+
+.login-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .25rem;
+    margin-block-start: 1.5rem;
+    padding-block-start: .75rem;
+    border-block-start: 1px solid var(--login-border);
+}
+
+.page-body:has(> .login-card) > .feedback-list {
+    margin: 0;
+}
+
+.login-card .validation { border-radius: var(--corner-card); }
+
+.page-body:has(> .login-card) .icon-action:hover {
+    background: var(--login-hover);
+}
+
+@media (max-width: 23.999rem) {
+    .masthead .guest-links a {
+        padding-inline: .5rem;
+    }
+}

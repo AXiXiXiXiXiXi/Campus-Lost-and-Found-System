@@ -1,0 +1,13 @@
+{% with control=filter_id|default:'school-filter' %}
+<div class="form-field">
+    <label for="{{ control }}">学校</label>
+    <select id="{{ control }}" name="school">
+        <option value="all"{% if selection == 'all' %} selected{% endif %}>所有学校</option>
+        {% if allow_system %}<option value="system"{% if selection == 'system' %} selected{% endif %}>仅系统公告</option>{% endif %}
+        {% for school in schools %}
+            <option value="{{ school.pk }}"{% if selection == school.pk|stringformat:"s" %} selected{% endif %}>{{ school.name }}</option>
+        {% endfor %}
+        {% if allow_unbound %}<option value="none"{% if selection == 'none' %} selected{% endif %}>未绑定学校</option>{% endif %}
+    </select>
+</div>
+{% endwith %}

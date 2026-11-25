@@ -1,0 +1,8 @@
+<figure class="item-visual{% if thumbnail %} item-thumbnail{% else %} item-photo{% endif %}">
+    {% if item.image %}
+        <img src="{{ item.image.url }}" alt="{{ item.title }}的物品照片"{% if thumbnail %} width="64" height="64" loading="lazy"{% endif %} data-entry-image>
+    {% endif %}
+    <span class="image-unavailable" role="img" aria-label="暂无物品图片" data-image-fallback{% if item.image %} hidden{% endif %}>
+        {% include 'lostfound/components/icon.html' with icon='image' only %}
+    </span>
+</figure>

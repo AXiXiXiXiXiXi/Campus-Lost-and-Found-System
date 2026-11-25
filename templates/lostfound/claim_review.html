@@ -1,63 +1,40 @@
 {% extends 'lostfound/base.html' %}
+{% load static %}
 
-{% block title %}审核认领申请 - 校园失物招领系统{% endblock %}
+{% block title %}审核认领申请 · 校园失物招领{% endblock %}
 
-{% block content %}
-<div class="card" style="max-width: 800px; margin: 0 auto;">
-    <h2 class="text-center" style="margin-bottom: 2rem; color: #667eea;">🔍 审核认领申请</h2>
-    
-    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-        <h3 style="color: #333; margin-bottom: 1rem;">失物信息</h3>
-        <p style="margin: 0.5rem 0;"><strong>标题：</strong>{{ claim.lost_item.title }}</p>
-        <p style="margin: 0.5rem 0;"><strong>发布人：</strong>{{ claim.lost_item.publish_user.username }}</p>
-    </div>
-
-    <div style="background: white; border: 1px solid #e0e0e0; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-        <h3 style="color: #333; margin-bottom: 1rem;">认领信息</h3>
-        <p style="margin: 0.5rem 0;"><strong>认领人：</strong>{{ claim.claim_user.username }}</p>
-        <p style="margin: 0.5rem 0;"><strong>申请时间：</strong>{{ claim.create_time|date:"Y-m-d H:i" }}</p>
-        <div style="margin-top: 1rem;">
-            <strong>认领说明：</strong>
-            <p style="color: #666; line-height: 1.8; white-space: pre-wrap; margin: 0.5rem 0;">{{ claim.claim_reason }}</p>
-        </div>
-    </div>
-    
-    <form method="post">
-        {% csrf_token %}
-        
-        <div class="form-group">
-            <label style="display: block; margin-bottom: 1rem; font-weight: 500;">{{ form.status.label }} <span style="color: red;">*</span></label>
-            {% for radio in form.status %}
-            <div style="margin-bottom: 0.5rem;">
-                {{ radio }}
-            </div>
-            {% endfor %}
-            {% if form.status.errors %}
-                <ul class="errorlist">
-                    {% for error in form.status.errors %}
-                    <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-
-        <div class="form-group">
-            <label for="{{ form.admin_note.id_for_label }}">{{ form.admin_note.label }}</label>
-            {{ form.admin_note }}
-            {% if form.admin_note.errors %}
-                <ul class="errorlist">
-                    {% for error in form.admin_note.errors %}
-                    <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-
-        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-            <button type="submit" class="btn btn-primary" style="flex: 1;">提交审核结果</button>
-            <a href="{% url 'claim_detail' claim.pk %}" class="btn btn-secondary" style="flex: 1; text-align: center; line-height: 2.5;">取消</a>
-        </div>
-    </form>
-</div>
+{% block page_styles %}
+    <link rel="stylesheet" href="{% static 'lostfound/record-forms.css' %}?v=2">
 {% endblock %}
 
+{% block content %}
+<section class="record-page record-page-reading" aria-labelledby="claim-review-title">
+    <header class="record-heading">
+        <a class="record-back" href="{% url 'claim_detail' claim.pk %}">{% include 'lostfound/components/icon.html' with icon='back' only %}返回申请详情</a>
+        <h1 id="claim-review-title">审核认领申请</h1>
+    </header>
+
+    <div class="record-layout">
+        <div class="record-stack">
+            <section class="record-panel" aria-labelledby="review-description">
+                <h2 id="review-description">申请人说明</h2>
+                <p class="record-subtitle">{{ claim.claim_user.username }} · <time datetime="{{ claim.create_time|date:'c' }}">{{ claim.create_time|date:"Y-m-d H:i" }}</time></p>
+                <p class="record-copy">{{ claim.claim_reason }}</p>
+            </section>
+
+            <form class="editor" method="post" aria-labelledby="review-title">
+                {% csrf_token %}
+                {% include 'lostfound/components/form_errors.html' %}
+                <h2 id="review-title">审核处理</h2>
+                {% include 'lostfound/components/field.html' with field=form.status only %}
+                {% include 'lostfound/components/field.html' with field=form.admin_note only %}
+                <div class="form-end record-actions">
+                    <button class="action action-primary" type="submit">提交审核结果</button>
+                    <a class="action action-outline" href="{% url 'claim_detail' claim.pk %}">取消</a>
+                </div>
+            </form>
+        </div>
+        {% include 'lostfound/components/claim_info.html' with item=claim.lost_item only %}
+    </div>
+</section>
+{% endblock %}

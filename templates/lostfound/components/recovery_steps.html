@@ -1,0 +1,14 @@
+<ol class="recovery-steps" role="list" aria-label="找回密码进度">
+    <li{% if step == 1 %} aria-current="step"{% endif %}>
+        <span class="recovery-step-number" aria-hidden="true">1</span>
+        <span>查找账号</span>
+    </li>
+    <li{% if step == 2 %} aria-current="step"{% endif %}>
+        <span class="recovery-step-number" aria-hidden="true">2</span>
+        <span>选择方式</span>
+    </li>
+    <li{% if step == 3 %} aria-current="step"{% endif %}>
+        <span class="recovery-step-number" aria-hidden="true">3</span>
+        <span>验证并重置</span>
+    </li>
+</ol>

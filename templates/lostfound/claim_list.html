@@ -1,73 +1,74 @@
 {% extends 'lostfound/base.html' %}
+{% load static %}
 
-{% block title %}认领申请 - 校园失物招领系统{% endblock %}
+{% block title %}认领申请 · 校园失物招领{% endblock %}
 
-{% block content %}
-<div class="card">
-    <h2 style="color: #667eea; margin-bottom: 2rem;">
-        ✋ {% if is_admin %}认领申请管理{% else %}我的认领申请{% endif %}
-    </h2>
-
-    {% if is_admin %}
-    <div style="background: #d1ecf1; border: 1px solid #17a2b8; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
-        <p style="margin: 0; color: #0c5460;">
-            <strong>管理员视图：</strong>您可以查看和审核本校所有认领申请
-        </p>
-    </div>
-    {% endif %}
-
-    {% if claims %}
-    <div style="display: grid; gap: 1rem;">
-        {% for claim in claims %}
-        <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; background: white;">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                <h3 style="margin: 0; color: #333;">
-                    <a href="{% url 'lost_item_detail' claim.lost_item.pk %}" style="color: #667eea; text-decoration: none;">
-                        {{ claim.lost_item.title }}
-                    </a>
-                </h3>
-                <span style="background: {% if claim.status == 'pending' %}#fff3cd{% elif claim.status == 'approved' %}#d4edda{% else %}#f8d7da{% endif %}; 
-                             color: {% if claim.status == 'pending' %}#856404{% elif claim.status == 'approved' %}#155724{% else %}#721c24{% endif %}; 
-                             padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500;">
-                    {{ claim.get_status_display }}
-                </span>
-            </div>
-
-            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                <div style="color: #666; font-size: 0.9rem; margin-bottom: 0.5rem;"><strong>认领说明：</strong></div>
-                <p style="color: #666; margin: 0; line-height: 1.6;">{{ claim.claim_reason|truncatewords:50 }}</p>
-            </div>
-
-            <div style="color: #999; font-size: 0.85rem; margin-bottom: 1rem;">
-                <span>认领人：{{ claim.claim_user.username }}</span> | 
-                <span>📅 申请时间：{{ claim.create_time|date:"Y-m-d H:i" }}</span>
-                {% if claim.status != 'pending' %}
-                | <span>🕐 处理时间：{{ claim.update_time|date:"Y-m-d H:i" }}</span>
-                {% endif %}
-            </div>
-
-            {% if claim.admin_note %}
-            <div style="background: #e7f3ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                <div style="color: #1976d2; font-size: 0.9rem; margin-bottom: 0.5rem;"><strong>管理员备注：</strong></div>
-                <p style="color: #666; margin: 0;">{{ claim.admin_note }}</p>
-            </div>
-            {% endif %}
-
-            <div style="display: flex; gap: 1rem;">
-                <a href="{% url 'claim_detail' claim.pk %}" class="btn btn-primary" style="flex: 1; text-align: center;">查看详情</a>
-                {% if is_admin and claim.status == 'pending' %}
-                <a href="{% url 'claim_review' claim.pk %}" class="btn btn-primary" style="flex: 1; text-align: center; background: #28a745;">审核</a>
-                {% endif %}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div style="text-align: center; padding: 3rem; color: #999;">
-        <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
-        <p>{% if is_admin %}暂无认领申请{% else %}您还没有提交过认领申请{% endif %}</p>
-    </div>
-    {% endif %}
-</div>
+{% block page_styles %}
+    <link rel="stylesheet" href="{% static 'lostfound/lists.css' %}?v=2">
 {% endblock %}
 
+{% block content %}
+<div class="list-page">
+    <header class="list-heading">
+        <div>
+            <h1>{% if is_admin %}认领申请管理{% else %}我的认领申请{% endif %}</h1>
+            <p>{% if is_admin %}查看认领说明，处理待审核的申请。{% else %}查看申请内容和审核进度。{% endif %}</p>
+        </div>
+    </header>
+
+    {% if is_superuser %}
+        <form class="filter-line" method="get" aria-label="筛选认领申请">
+            {% include 'lostfound/components/school_filter.html' with selection=current_school_id %}
+            <div class="actions">
+                <button class="action action-outline" type="submit">筛选</button>
+                {% if current_school_id != 'all' %}<a class="inline-action" href="{% url 'claim_list' %}">重置</a>{% endif %}
+            </div>
+            <p class="filter-scope secondary">{{ current_school_name }}</p>
+        </form>
+    {% elif is_admin %}
+        <p class="list-scope">{{ current_school_name }}</p>
+    {% endif %}
+
+    <section class="list-panel" aria-labelledby="claim-results">
+        <header class="list-panel-heading">
+            <h2 id="claim-results">申请记录</h2>
+            <p>共 {{ claims|length }} 条</p>
+        </header>
+        {% if claims %}
+            <ul class="list-records">
+                {% for claim in claims %}
+                    <li>
+                        <article class="list-row list-claim">
+                            <div class="list-summary">
+                                <h3><a class="list-title-link" href="{% url 'lost_item_detail' claim.lost_item.pk %}">{{ claim.lost_item.title }}</a></h3>
+                                <p class="list-meta">
+                                    {{ claim.claim_user.username }}{% if is_superuser %} · {{ claim.lost_item.school.name }}{% endif %} ·
+                                    申请于 <time datetime="{{ claim.create_time|date:'c' }}">{{ claim.create_time|date:"Y-m-d H:i" }}</time>
+                                </p>
+                                <p>{{ claim.claim_reason|truncatechars:150 }}</p>
+                                {% if claim.status != 'pending' %}
+                                    <p class="list-meta">处理于 <time datetime="{{ claim.update_time|date:'c' }}">{{ claim.update_time|date:"Y-m-d H:i" }}</time></p>
+                                {% endif %}
+                                {% if claim.admin_note %}<p class="list-meta"><strong>管理员备注</strong> {{ claim.admin_note|truncatechars:120 }}</p>{% endif %}
+                            </div>
+                            <div class="list-row-tools">
+                                {% include 'lostfound/components/status.html' with status=claim.status label=claim.get_status_display only %}
+                                <div class="list-actions">
+                                    <a class="list-action" href="{% url 'claim_detail' claim.pk %}" aria-label="查看认领申请：{{ claim.lost_item.title }}">查看申请</a>
+                                    {% if is_admin and claim.status == 'pending' %}
+                                        <a class="list-button" href="{% url 'claim_review' claim.pk %}" aria-label="审核申请：{{ claim.lost_item.title }}">审核申请</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </article>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% elif is_admin %}
+            {% include 'lostfound/components/empty.html' with title='暂无认领申请' description='待审核和已处理的申请会显示在这里。' only %}
+        {% else %}
+            {% include 'lostfound/components/empty.html' with title='暂无认领申请' description='提交认领后，可以在这里查看处理进度。' only %}
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

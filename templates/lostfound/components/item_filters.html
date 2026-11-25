@@ -1,0 +1,24 @@
+<form class="filter-line" method="get" aria-label="{{ filter_label }}">
+    {% if is_superuser %}
+        {% include 'lostfound/components/school_filter.html' with selection=current_school_id %}
+    {% endif %}
+    <div class="form-field">
+        <label for="status-filter">物品状态</label>
+        <select id="status-filter" name="status">
+            <option value="all"{% if status_filter == 'all' %} selected{% endif %}>全部状态</option>
+            <option value="unclaimed"{% if status_filter == 'unclaimed' %} selected{% endif %}>{% if found %}待认领{% else %}未认领{% endif %}</option>
+            {% if found %}
+                <option value="returned"{% if status_filter == 'returned' %} selected{% endif %}>已归还</option>
+            {% else %}
+                <option value="claimed"{% if status_filter == 'claimed' %} selected{% endif %}>已认领</option>
+            {% endif %}
+        </select>
+    </div>
+    <div class="actions">
+        <button class="action action-outline" type="submit">筛选</button>
+        {% if status_filter != 'all' or is_superuser and current_school_id != 'all' %}
+            <a class="inline-action" href="{% url list_route %}">重置</a>
+        {% endif %}
+    </div>
+    <p class="filter-scope secondary">{{ current_school_name }}</p>
+</form>

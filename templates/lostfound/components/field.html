@@ -1,0 +1,17 @@
+{% if field.is_hidden %}
+    {{ field }}
+{% else %}
+    <div class="form-field{% if wide %} field-span{% endif %}"{% if field.errors %} data-invalid{% endif %}>
+        {% if field.use_fieldset %}
+            <fieldset class="form-choice"{% if field.aria_describedby %} aria-describedby="{{ field.aria_describedby }}"{% endif %}>
+                {{ field.legend_tag }}
+                {{ field }}
+            </fieldset>
+        {% else %}
+            {{ field.label_tag }}
+            {{ field }}
+        {% endif %}
+        {% if field.help_text %}<p class="helper" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</p>{% endif %}
+        {{ field.errors }}
+    </div>
+{% endif %}
